@@ -1,0 +1,192 @@
+{
+    "entry": {
+        "title": "Game Card",
+        "game_card_config": {
+            "focus_card": 1,
+            "future_game_count": 1,
+            "past_game_count": 1
+        },
+        "past_game_card": {
+            "background_image": {
+                "uid": "blt11706bd1cad23e04",
+                "created_at": "2024-07-03T11:53:51.720Z",
+                "updated_at": "2024-07-03T11:53:51.720Z",
+                "created_by": "blt34f1e9fe2a5e84b3",
+                "updated_by": "blt34f1e9fe2a5e84b3",
+                "content_type": "image/png",
+                "file_size": "193668",
+                "tags": [],
+                "filename": "past_game_card_new.png",
+                "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt11706bd1cad23e04/66853bcfb84bce7df708c9dd/past_game_card_new.png",
+                "ACL": [],
+                "is_dir": false,
+                "parent_uid": "blt87847348837005fa",
+                "_version": 1,
+                "title": "past_game_card_new.png",
+                "dimension": {
+                    "height": 957,
+                    "width": 996
+                },
+                "publish_details": [
+                    {
+                        "environment": "bltabd1ca10364db0c0",
+                        "locale": "en-us",
+                        "time": "2024-07-03T11:54:05.843Z",
+                        "user": "blt34f1e9fe2a5e84b3",
+                        "version": 1
+                    }
+                ]
+            },
+            "button": {
+                "cta_text": "GAME RECAP",
+                "icons": {
+                    "leading_icon": null,
+                    "trailing_icon": null
+                },
+                "cta_link": "miamiheat://screen/game/details"
+            }
+        },
+        "upcoming_game": {
+            "background_image": {
+                "uid": "blt7cec778ffeda1128",
+                "created_at": "2024-07-03T11:53:51.500Z",
+                "updated_at": "2024-07-03T11:53:51.500Z",
+                "created_by": "blt34f1e9fe2a5e84b3",
+                "updated_by": "blt34f1e9fe2a5e84b3",
+                "content_type": "image/png",
+                "file_size": "730999",
+                "tags": [],
+                "filename": "upcoming_game_card_new.png",
+                "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt7cec778ffeda1128/66853bcf62008a1d5910c932/upcoming_game_card_new.png",
+                "ACL": [],
+                "is_dir": false,
+                "parent_uid": "blt87847348837005fa",
+                "_version": 1,
+                "title": "upcoming_game_card_new.png",
+                "dimension": {
+                    "height": 957,
+                    "width": 996
+                },
+                "publish_details": [
+                    {
+                        "environment": "bltabd1ca10364db0c0",
+                        "locale": "en-us",
+                        "time": "2024-07-03T11:54:12.666Z",
+                        "user": "blt34f1e9fe2a5e84b3",
+                        "version": 1
+                    }
+                ]
+            },
+            "button": {
+                "cta_text": "BUY TICKETS ON",
+                "icons": {
+                    "trailing_icon": {
+                        "uid": "blt904f2379449afd01",
+                        "created_at": "2024-04-02T10:58:01.690Z",
+                        "updated_at": "2024-04-02T10:58:19.884Z",
+                        "created_by": "blt34f1e9fe2a5e84b3",
+                        "updated_by": "blt34f1e9fe2a5e84b3",
+                        "content_type": "image/png",
+                        "file_size": "3310",
+                        "tags": [],
+                        "filename": "Ticketmaster_Logo.png",
+                        "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt904f2379449afd01/660be4b91b5a586870add3f1/Ticketmaster_Logo.png",
+                        "ACL": [],
+                        "is_dir": false,
+                        "parent_uid": "blt660ac6721ca8bb34",
+                        "_version": 2,
+                        "title": "Ticketmaster_Logo.png",
+                        "dimension": {
+                            "height": 40,
+                            "width": 295
+                        },
+                        "publish_details": [
+                            {
+                                "environment": "bltabd1ca10364db0c0",
+                                "locale": "en-us",
+                                "time": "2024-04-02T10:58:22.763Z",
+                                "user": "blt34f1e9fe2a5e84b3",
+                                "version": 2
+                            }
+                        ]
+                    },
+                    "leading_icon": null
+                },
+                "cta_link": "miamiheat://screen/buy_ticket"
+            }
+        },
+        "future_game": {
+            "background_image": {
+                "uid": "bltb55816cc5c3ea465",
+                "created_at": "2024-05-28T10:23:14.718Z",
+                "updated_at": "2024-05-28T10:23:14.718Z",
+                "created_by": "blt3b0e6dba12024a93",
+                "updated_by": "blt3b0e6dba12024a93",
+                "content_type": "image/png",
+                "file_size": "767369",
+                "tags": [],
+                "filename": "future_game_card.png",
+                "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/bltb55816cc5c3ea465/6655b09289ebe633fc0ab3f2/future_game_card.png",
+                "ACL": [],
+                "is_dir": false,
+                "parent_uid": "blt8bc20845686a9235",
+                "_version": 1,
+                "title": "future_game_card.png",
+                "dimension": {
+                    "height": 957,
+                    "width": 996
+                },
+                "publish_details": [
+                    {
+                        "environment": "bltabd1ca10364db0c0",
+                        "locale": "en-us",
+                        "time": "2024-05-28T10:26:45.922Z",
+                        "user": "blt3b0e6dba12024a93",
+                        "version": 1
+                    }
+                ]
+            },
+            "button": {
+                "cta_text": "",
+                "icons": {
+                    "leading_icon": null,
+                    "trailing_icon": null
+                },
+                "cta_link": ""
+            }
+        },
+        "tags": [],
+        "locale": "en-us",
+        "uid": "blte2eac31751983ccd",
+        "created_by": "blt3b0e6dba12024a93",
+        "updated_by": "blt34f1e9fe2a5e84b3",
+        "created_at": "2024-05-28T10:26:42.553Z",
+        "updated_at": "2024-07-09T19:12:07.847Z",
+        "ACL": {},
+        "_version": 27,
+        "_in_progress": false,
+        "promotion_cards": [
+            {
+                "position": 4,
+                "_metadata": {
+                    "uid": "csb48095e2450465ce"
+                },
+                "card": [
+                    {
+                        "uid": "blt5c798e3ce03ab216",
+                        "_content_type_uid": "r_promotion_card"
+                    }
+                ]
+            }
+        ],
+        "publish_details": [
+            {
+                "environment": "bltabd1ca10364db0c0",
+                "locale": "en-us",
+                "time": "2024-07-09T19:12:11.793Z",
+                "user": "blt34f1e9fe2a5e84b3",
+                "version": 27
+            }
+        ]
+    }
+}
