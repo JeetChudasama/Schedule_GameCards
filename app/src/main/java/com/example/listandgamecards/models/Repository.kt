@@ -1,6 +1,9 @@
 package com.example.listandgamecards.models
 
 import android.content.Context
+import com.example.listandgamecards.Utils.getJsonDataFromGame
+import com.example.listandgamecards.Utils.getJsonDataFromSchedule
+import com.example.listandgamecards.Utils.getJsonDataFromTeams
 import com.google.gson.Gson
 
 class RepositoryImpl(private val applicationContext: Context) : ScheduleRepository {

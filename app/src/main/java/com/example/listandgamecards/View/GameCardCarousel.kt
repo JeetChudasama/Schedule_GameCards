@@ -1,35 +1,554 @@
 package com.example.listandgamecards.View
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import com.example.listandgamecards.models.Entry
+import com.example.listandgamecards.models.FutureGame
+import com.example.listandgamecards.models.PastGameCard
+import com.example.listandgamecards.models.Schedule
+import com.example.listandgamecards.models.Team
+import com.example.listandgamecards.models.UpcomingGame
+import com.example.listandgamecards.Utils.formatDateToCustomFormat
+import com.example.listandgamecards.Utils.formatTime
+import com.example.listandgamecards.usecases.filterScheduleByStatus
+import com.example.listandgamecards.usecases.getLatestPastGame
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun GameCardList(cardItems: List<String>) {
-    LazyRow {
-        items(cardItems) { cardItem ->
-            GameCardView(cardItem = "cardItem")
+fun GamesTab(games: Entry, schedule: List<Schedule>, team: List<Team>) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.Top
+    ) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                PastGameCardImage(games.pastGameCard, schedule = schedule, team = team)
+            }
+            item {
+                UpcomingGameImage(games.upcomingGame, schedule = schedule, team = team)
+            }
+            item {
+                FutureGameImage(games.futureGame, schedule = schedule, team = team)
+            }
         }
     }
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun GameCardView(cardItem: String) {
-    Card {
-        Row {
-            Text(text = cardItem)
-            // Add other content for your card layout
+fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team: List<Team>) {
+    // Filter past games and sort by date
+    val pastGames = filterScheduleByStatus(schedule, 3)
+    val latestPastGame = getLatestPastGame(pastGames)
+
+    // Check if there's a past game to display
+    latestPastGame?.let { scheduleItem ->
+        val homeTeam = team.find { it.tid == scheduleItem.h.tid }
+        val visitorTeam = team.find { it.tid == scheduleItem.v.tid }
+        val tid =
+            team.find { it.tid == scheduleItem.h.tid || it.tid == scheduleItem.v.tid }?.tid
+        val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
+        val gameStatus = scheduleItem.st
+
+        Card(
+            modifier = Modifier
+                .width(200.dp)
+                .height(200.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ){
+                Image(
+                    painter = rememberAsyncImagePainter(pastGameCard.backgroundImage.url),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(8.dp)
+                ) {
+                    // Row to display team logos and game details
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(visitorTeam?.logo),
+                            contentDescription = "visitor team",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        when (gameStatus.toInt()) {
+                            1 -> visitorTeam?.ta
+                            2 -> scheduleItem.v.s
+                            3 -> scheduleItem.v.s
+                            else -> "N/A"
+                        }?.let {
+                            Text(
+                                text = it,
+                                color = Color.White
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = displayVS,
+                            color = Color.White
+                        ) // If the app team is the Home Team, display "VS" or If the app team is the Visitor Team, display "@"
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        when (gameStatus.toInt()) {
+                            1 -> homeTeam?.ta
+                            2 -> scheduleItem.h.s
+                            3 -> scheduleItem.h.s
+                            else -> "N/A"
+                        }?.let {
+                            Text(
+                                text = it,
+                                color = Color.White
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Image(
+                            painter = rememberAsyncImagePainter(homeTeam?.logo),
+                            contentDescription = "home team",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
+                            visitorTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold) }
+                        }
+                        Spacer(modifier = Modifier.width(96.dp))
+                        if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
+                            homeTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold) }
+                        }
+                    }
+
+                    // Card for "GAME RECAP"
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                        colors = CardDefaults.cardColors(Color(0xFFFFC107)),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(25.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "GAME RECAP", color = Color.Black, style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-@Preview
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PreviewLazyRowWithCards() {
-    val sampleItems = listOf("Item 1", "Item 2", "Item 3")
-    GameCardList(cardItems = sampleItems)
+fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team: List<Team>) {
+    // Filter and sort the schedule for upcoming games (gameStatus = 1)
+    val upcomingGames = schedule.filter { it.st.toInt() == 1 }.sortedBy {
+        LocalDate.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+    }
+
+    // Get the first upcoming game
+    val nextUpcomingGame = upcomingGames.firstOrNull()
+
+    nextUpcomingGame?.let { scheduleItem ->
+        val homeTeam = team.find { it.tid == scheduleItem.h.tid }
+        val visitorTeam = team.find { it.tid == scheduleItem.v.tid }
+        val tid = team.find { it.tid == scheduleItem.h.tid || it.tid == scheduleItem.v.tid }?.tid
+        val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
+        val gameStatus = scheduleItem.st
+        val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
+        val uriHandler = LocalUriHandler.current
+
+        Card(
+            modifier = Modifier
+                .width(200.dp)
+                .height(200.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(upcomingGame.backgroundImage.url),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 8.dp, top = 8.dp)
+                ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ){
+                        Image(
+                            painter = rememberAsyncImagePainter(visitorTeam?.logo),
+                            contentDescription = "visitor team",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Image(
+                            painter = rememberAsyncImagePainter(homeTeam?.logo),
+                            contentDescription = "home team",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 1.dp)
+                    ){
+                        homeTeam?.ta?.let {
+                            Text(
+                                text = it,
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = displayVS,
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        visitorTeam?.ta?.let {
+                            Text(
+                                text = it,
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        if (gameStatus.toInt() == 1) {
+                            Text(
+                                text = displayHA,
+                                color = Color.DarkGray,
+                                fontSize = 7.sp
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Divider(
+                                color = Color.DarkGray,
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .width(1.dp)
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                        }
+
+                        if (gameStatus.toInt() == 1) {
+                            Text(
+                                text = formatDateToCustomFormat(scheduleItem.gametime),
+                                color = Color.DarkGray,
+                                fontSize = 7.sp
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Divider(
+                                color = Color.DarkGray,
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .width(1.dp)
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                        }
+                        Text(
+                            text = formatTime(scheduleItem.gametime),
+                            color = Color.DarkGray,
+                            fontSize = 7.sp
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(8.dp)
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                        colors = CardDefaults.cardColors(Color.White),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(25.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "BUY TICKETS ON", color = Color.Black, style = TextStyle(
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Image(
+                                painter = rememberAsyncImagePainter(upcomingGame.button.icons.trailingIcon.url),
+                                contentDescription = "ticketmaster logo",
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List<Team>) {
+    // Filter and sort the schedule for future games (gameStatus = 1)
+    val futureGames = schedule.filter { it.st.toInt() == 1 }.sortedBy {
+        LocalDate.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+    }
+
+    // Get the second future game
+    val secondFutureGame = futureGames.getOrNull(1)
+
+    secondFutureGame?.let { scheduleItem ->
+        val homeTeam = team.find { it.tid == scheduleItem.h.tid }
+        val visitorTeam = team.find { it.tid == scheduleItem.v.tid }
+        val tid = team.find { it.tid == scheduleItem.h.tid || it.tid == scheduleItem.v.tid }?.tid
+        val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
+        val gameStatus = scheduleItem.st
+        val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
+
+        Card(
+            modifier = Modifier
+                .width(200.dp)
+                .height(200.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(futureGame.backgroundImage.url),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 8.dp, top = 8.dp)
+                ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ){
+                        Image(
+                            painter = rememberAsyncImagePainter(visitorTeam?.logo),
+                            contentDescription = "visitor team",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Image(
+                            painter = rememberAsyncImagePainter(homeTeam?.logo),
+                            contentDescription = "home team",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 1.dp)
+                    ){
+                        homeTeam?.ta?.let {
+                            Text(
+                                text = it,
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = displayVS,
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        visitorTeam?.ta?.let {
+                            Text(
+                                text = it,
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        if (gameStatus.toInt() == 1) {
+                            Text(
+                                text = displayHA,
+                                color = Color.White,
+                                fontSize = 7.sp
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Divider(
+                                color = Color.White,
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .width(1.dp)
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                        }
+
+                        if (gameStatus.toInt() == 1) {
+                            Text(
+                                text = formatDateToCustomFormat(scheduleItem.gametime),
+                                color = Color.White,
+                                fontSize = 7.sp
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Divider(
+                                color = Color.White,
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .width(1.dp)
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                        }
+                        Text(
+                            text = formatTime(scheduleItem.gametime),
+                            color = Color.White,
+                            fontSize = 7.sp
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(8.dp)
+                ) {
+
+                }
+            }
+        }
+    }
 }

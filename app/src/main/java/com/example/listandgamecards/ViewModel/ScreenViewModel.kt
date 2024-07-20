@@ -1,13 +1,15 @@
-package com.example.listandgamecards.models
+package com.example.listandgamecards.ViewModel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.listandgamecards.models.Entry
+import com.example.listandgamecards.models.Schedule
+import com.example.listandgamecards.models.ScheduleRepository
+import com.example.listandgamecards.models.Team
 import kotlinx.coroutines.launch
 
-// MainViewModel.kt
 class ScreenViewModel(private val repository: ScheduleRepository) : ViewModel() {
     private val _schedule = MutableLiveData<List<Schedule>>()
     val schedule: LiveData<List<Schedule>> = _schedule
