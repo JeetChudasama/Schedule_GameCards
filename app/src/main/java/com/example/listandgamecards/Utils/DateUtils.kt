@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -17,14 +18,17 @@ fun formatDateToMonthYear(dateString: String, inputFormat: String = "yyyy-MM-dd"
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatDateToCustomFormat(dateString: String): String {
-    val date = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
-    return date.format(DateTimeFormatter.ofPattern("EEE MMM dd", Locale.ENGLISH))
+fun formatDateToCustomFormat(dateString: String, timeZone: String = "UTC"): String {
+    val dateTime = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
+    val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone)) // Original time zone
+    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() // Convert to local time
+    return localDateTime.format(DateTimeFormatter.ofPattern("EEE MMM dd", Locale.ENGLISH))
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatTime(dateTimeString: String): String {
+fun formatTime(dateTimeString: String, timeZone: String = "UTC"): String {
     val dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_DATE_TIME)
-    val formatter = DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH)
-    return dateTime.format(formatter)
+    val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone)) // Original time zone
+    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() // Convert to local time
+    return localDateTime.format(DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH))
 }

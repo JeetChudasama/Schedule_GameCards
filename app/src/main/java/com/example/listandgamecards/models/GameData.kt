@@ -299,11 +299,184 @@ data class Metadata(
 )
 
 data class Card(
-    val uid: String,
     @SerializedName("_content_type_uid")
     val contentTypeUid: String,
+    val uid: String,
+    @SerializedName("_version")
+    val version: Long,
+    val locale: String,
+    @SerializedName("ACL")
+    val acl: Map<String, Any>,
+    @SerializedName("_in_progress")
+    val inProgress: Boolean,
+    @SerializedName("background_image")
+    val backgroundImage: BackgroundImage4,
+    val button: Button4,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("created_by")
+    val createdBy: String,
+    @SerializedName("cta_link")
+    val ctaLink: String,
+    val description: String,
+    val sponsor: Sponsor,
+    val tags: List<Any?>,
+    val title: String,
+    @SerializedName("updated_at")
+    val updatedAt: String,
+    @SerializedName("updated_by")
+    val updatedBy: String,
+    @SerializedName("publish_details")
+    val publishDetails: PublishDetails4,
 )
 
+data class BackgroundImage4(
+    @SerializedName("_version")
+    val version: Long,
+    @SerializedName("is_dir")
+    val isDir: Boolean,
+    val uid: String,
+    @SerializedName("ACL")
+    val acl: Map<String, Any>,
+    @SerializedName("content_type")
+    val contentType: String,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("created_by")
+    val createdBy: String,
+    @SerializedName("file_size")
+    val fileSize: String,
+    val filename: String,
+    @SerializedName("parent_uid")
+    val parentUid: String,
+    val tags: List<Any?>,
+    val title: String,
+    @SerializedName("updated_at")
+    val updatedAt: String,
+    @SerializedName("updated_by")
+    val updatedBy: String,
+    @SerializedName("publish_details")
+    val publishDetails: PublishDetails,
+    val url: String,
+)
+
+data class PublishDetails(
+    val environment: String,
+    val locale: String,
+    val time: String,
+    val user: String,
+)
+
+data class Button4(
+    @SerializedName("cta_text")
+    val ctaText: String,
+    val icons: Icons4,
+    @SerializedName("cta_link")
+    val ctaLink: String,
+)
+
+data class Icons4(
+    @SerializedName("leading_icon")
+    val leadingIcon: LeadingIcon?,
+    @SerializedName("trailing_icon")
+    val trailingIcon: TrailingIcon2?,
+    @SerializedName("leading_theme_icons")
+    val leadingThemeIcons: List<Any?>?,
+    @SerializedName("trailing_theme_icons")
+    val trailingThemeIcons: List<Any?>?,
+)
+
+data class LeadingIcon(
+    @SerializedName("_version")
+    val version: Long,
+    @SerializedName("is_dir")
+    val isDir: Boolean,
+    val uid: String,
+    @SerializedName("ACL")
+    val acl: Map<String, Any>,
+    @SerializedName("content_type")
+    val contentType: String,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("created_by")
+    val createdBy: String,
+    @SerializedName("file_size")
+    val fileSize: String,
+    val filename: String,
+    @SerializedName("parent_uid")
+    val parentUid: String,
+    val tags: List<Any?>,
+    val title: String,
+    @SerializedName("updated_at")
+    val updatedAt: String,
+    @SerializedName("updated_by")
+    val updatedBy: String,
+    @SerializedName("publish_details")
+    val publishDetails: PublishDetails2,
+    val url: String,
+)
+
+data class PublishDetails2(
+    val environment: String,
+    val locale: String,
+    val time: String,
+    val user: String,
+)
+
+data class TrailingIcon2(
+    @SerializedName("_version")
+    val version: Long,
+    @SerializedName("is_dir")
+    val isDir: Boolean,
+    val uid: String,
+    @SerializedName("ACL")
+    val acl: Map<String, Any>,
+    @SerializedName("content_type")
+    val contentType: String,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("created_by")
+    val createdBy: String,
+    @SerializedName("file_size")
+    val fileSize: String,
+    val filename: String,
+    @SerializedName("parent_uid")
+    val parentUid: String,
+    val tags: List<Any?>,
+    val title: String,
+    @SerializedName("updated_at")
+    val updatedAt: String,
+    @SerializedName("updated_by")
+    val updatedBy: String,
+    @SerializedName("publish_details")
+    val publishDetails: PublishDetails3,
+    val url: String,
+)
+
+data class PublishDetails3(
+    val environment: String,
+    val locale: String,
+    val time: String,
+    val user: String,
+)
+
+data class Sponsor(
+    @SerializedName("sponsor_text")
+    val sponsorText: String,
+    @SerializedName("sponsor_icon")
+    val sponsorIcon: Any?,
+    @SerializedName("cta_link")
+    val ctaLink: String,
+    @SerializedName("sponsor_theme_icons")
+    val sponsorThemeIcons: List<Any?>?,
+)
+
+data class PublishDetails4(
+    val time: String,
+    val user: String,
+    val environment: String,
+    val locale: String,
+)
 data class PublishDetail5(
     val environment: String,
     val locale: String,

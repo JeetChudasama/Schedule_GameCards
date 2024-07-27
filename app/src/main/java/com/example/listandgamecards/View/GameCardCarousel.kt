@@ -41,9 +41,12 @@ import com.example.listandgamecards.models.Team
 import com.example.listandgamecards.models.UpcomingGame
 import com.example.listandgamecards.Utils.formatDateToCustomFormat
 import com.example.listandgamecards.Utils.formatTime
+import com.example.listandgamecards.models.PromotionCard
 import com.example.listandgamecards.usecases.filterScheduleByStatus
 import com.example.listandgamecards.usecases.getLatestPastGame
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -70,7 +73,102 @@ fun GamesTab(games: Entry, schedule: List<Schedule>, team: List<Team>) {
             item {
                 FutureGameImage(games.futureGame, schedule = schedule, team = team)
             }
+            item {
+                PromotionGameCard(games.promotionCards, schedule = schedule, team = team)
+            }
         }
+    }
+}
+
+@Composable
+fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedule>, team: List<Team>) {
+    val promotionCard = promotionCards.firstOrNull { it.position.toInt() == 2 }
+
+    when(promotionCard != null){
+        true ->
+            Card(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(200.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                shape = RoundedCornerShape(16.dp)
+            ){
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    promotionCard.card.firstOrNull()?.let { card ->
+                        Image(
+                            painter = rememberAsyncImagePainter(card.backgroundImage.url),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(8.dp)
+                        ){
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Text(text = card.title, color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Text(text = "2023/24", color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Normal
+                                    )
+                                )
+                            }
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+                                colors = CardDefaults.cardColors(Color(0xFFFFC108)),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(25.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = card.button.ctaText, color = Color.Black,
+                                        style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+        false -> TODO()
     }
 }
 
@@ -222,9 +320,19 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
 @Composable
 fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team: List<Team>) {
     // Filter and sort the schedule for upcoming games (gameStatus = 1)
-    val upcomingGames = schedule.filter { it.st.toInt() == 1 }.sortedBy {
-        LocalDate.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-    }
+    val upcomingGames = schedule
+        .filter { it.st.toInt() == 1 }
+        .sortedBy {
+            try {
+                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                    .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
+                zonedDateTime.toLocalDate() // Get local date for sorting
+            } catch (e: Exception) {
+                // Handle parse exception if necessary, e.g., logging
+                LocalDate.MIN // Use a default date in case of parse error
+            }
+        }
 
     // Get the first upcoming game
     val nextUpcomingGame = upcomingGames.firstOrNull()
@@ -405,9 +513,19 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
 @Composable
 fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List<Team>) {
     // Filter and sort the schedule for future games (gameStatus = 1)
-    val futureGames = schedule.filter { it.st.toInt() == 1 }.sortedBy {
-        LocalDate.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-    }
+    val futureGames = schedule
+        .filter { it.st.toInt() == 1 }
+        .sortedBy {
+            try {
+                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                    .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
+                zonedDateTime.toLocalDate() // Get local date for sorting
+            } catch (e: Exception) {
+                // Handle parse exception if necessary, e.g., logging
+                LocalDate.MIN // Use a default date in case of parse error
+            }
+        }
 
     // Get the second future game
     val secondFutureGame = futureGames.getOrNull(1)

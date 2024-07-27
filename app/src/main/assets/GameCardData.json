@@ -167,14 +167,181 @@
         "_in_progress": false,
         "promotion_cards": [
             {
-                "position": 4,
+                "position": 2,
                 "_metadata": {
                     "uid": "csb48095e2450465ce"
                 },
                 "card": [
                     {
+                        "_content_type_uid": "r_promotion_card",
                         "uid": "blt5c798e3ce03ab216",
-                        "_content_type_uid": "r_promotion_card"
+                        "_version": 10,
+                        "locale": "en-us",
+                        "ACL": {},
+                        "_in_progress": false,
+                        "background_image": {
+                            "_version": 1,
+                            "is_dir": false,
+                            "uid": "blt0d877e3b977be66a",
+                            "ACL": {},
+                            "content_type": "image/png",
+                            "created_at": "2024-07-03T11:53:51.502Z",
+                            "created_by": "blt34f1e9fe2a5e84b3",
+                            "file_size": "1551196",
+                            "filename": "schedule_card_new.png",
+                            "parent_uid": "blt87847348837005fa",
+                            "tags": [],
+                            "title": "schedule_card_new.png",
+                            "updated_at": "2024-07-03T11:53:51.502Z",
+                            "updated_by": "blt34f1e9fe2a5e84b3",
+                            "publish_details": {
+                                "environment": "bltabd1ca10364db0c0",
+                                "locale": "en-us",
+                                "time": "2024-07-03T11:54:09.227Z",
+                                "user": "blt34f1e9fe2a5e84b3"
+                            },
+                            "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt0d877e3b977be66a/66853bcf534a9d1d68ade456/schedule_card_new.png"
+                        },
+                        "button": {
+                            "cta_text": "VIEW ALL UPCOMING GAMES",
+                            "icons": {
+                                "leading_icon": {
+                                    "_version": 2,
+                                    "is_dir": false,
+                                    "uid": "blt904f2379449afd01",
+                                    "ACL": {},
+                                    "content_type": "image/png",
+                                    "created_at": "2024-04-02T10:58:01.690Z",
+                                    "created_by": "blt34f1e9fe2a5e84b3",
+                                    "file_size": "3310",
+                                    "filename": "Ticketmaster_Logo.png",
+                                    "parent_uid": "blt660ac6721ca8bb34",
+                                    "tags": [],
+                                    "title": "Ticketmaster_Logo.png",
+                                    "updated_at": "2024-04-02T10:58:19.884Z",
+                                    "updated_by": "blt34f1e9fe2a5e84b3",
+                                    "publish_details": {
+                                        "environment": "bltabd1ca10364db0c0",
+                                        "locale": "en-us",
+                                        "time": "2024-04-02T10:58:22.604Z",
+                                        "user": "blt34f1e9fe2a5e84b3"
+                                    },
+                                    "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt904f2379449afd01/660be4b91b5a586870add3f1/Ticketmaster_Logo.png"
+                                },
+                                "trailing_icon": {
+                                    "_version": 2,
+                                    "is_dir": false,
+                                    "uid": "blt904f2379449afd01",
+                                    "ACL": {},
+                                    "content_type": "image/png",
+                                    "created_at": "2024-04-02T10:58:01.690Z",
+                                    "created_by": "blt34f1e9fe2a5e84b3",
+                                    "file_size": "3310",
+                                    "filename": "Ticketmaster_Logo.png",
+                                    "parent_uid": "blt660ac6721ca8bb34",
+                                    "tags": [],
+                                    "title": "Ticketmaster_Logo.png",
+                                    "updated_at": "2024-04-02T10:58:19.884Z",
+                                    "updated_by": "blt34f1e9fe2a5e84b3",
+                                    "publish_details": {
+                                        "environment": "bltabd1ca10364db0c0",
+                                        "locale": "en-us",
+                                        "time": "2024-04-02T10:58:22.604Z",
+                                        "user": "blt34f1e9fe2a5e84b3"
+                                    },
+                                    "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt904f2379449afd01/660be4b91b5a586870add3f1/Ticketmaster_Logo.png"
+                                },
+                                "leading_theme_icons": [],
+                                "trailing_theme_icons": []
+                            },
+                            "cta_link": "miamiheat://screen/team/schedule"
+                        },
+                        "created_at": "2024-06-26T06:13:31.497Z",
+                        "created_by": "blt34f1e9fe2a5e84b3",
+                        "cta_link": "https://app.bitrise.io/app/cf2fb725-390a-4acd-b940-122755b0310a/build/09f95232-93c6-4cc7-8d60-4e85d5be5a20/artifact/0ca977a76ba1a4c7/p/ba4af01dfdcbc61a8086670131ff9b25",
+                        "description": "2023/24",
+                        "sponsor": {
+                            "sponsor_text": "",
+                            "sponsor_icon": null,
+                            "cta_link": "",
+                            "sponsor_theme_icons": []
+                        },
+                        "tags": [],
+                        "title": "FULL HEAT SCHEDULE",
+                        "updated_at": "2024-07-18T09:06:33.810Z",
+                        "updated_by": "blt34f1e9fe2a5e84b3",
+                        "publish_details": {
+                            "time": "2024-07-18T09:06:36.807Z",
+                            "user": "blt34f1e9fe2a5e84b3",
+                            "environment": "bltabd1ca10364db0c0",
+                            "locale": "en-us"
+                        }
+                    }
+                ]
+            },
+            {
+                "position": 4,
+                "_metadata": {
+                    "uid": "cs8ad055211b08b2a7"
+                },
+                "card": [
+                    {
+                        "_content_type_uid": "r_promotion_card",
+                        "uid": "blt707300da91de4bf9",
+                        "_version": 2,
+                        "locale": "en-us",
+                        "ACL": {},
+                        "_in_progress": false,
+                        "background_image": {
+                            "uid": "blt65ed639c4a8fee27",
+                            "_version": 1,
+                            "title": "promotion_card.png",
+                            "parent_uid": "blt8bc20845686a9235",
+                            "created_by": "blt3b0e6dba12024a93",
+                            "updated_by": "blt3b0e6dba12024a93",
+                            "created_at": "2024-05-28T10:26:35.822Z",
+                            "updated_at": "2024-05-28T10:26:35.822Z",
+                            "content_type": "image/png",
+                            "file_size": "1720118",
+                            "filename": "promotion_card.png",
+                            "ACL": {},
+                            "is_dir": false,
+                            "tags": [],
+                            "publish_details": {
+                                "time": "2024-05-28T10:26:45.939Z",
+                                "user": "blt3b0e6dba12024a93",
+                                "environment": "bltabd1ca10364db0c0",
+                                "locale": "en-us"
+                            },
+                            "url": "https://images.contentstack.io/v3/assets/blt787bc9d35cf46301/blt65ed639c4a8fee27/6655b15b6bf5e0baa0af3d4d/promotion_card.png"
+                        },
+                        "button": {
+                            "cta_text": "",
+                            "icons": {
+                                "leading_icon": null,
+                                "trailing_icon": null
+                            },
+                            "cta_link": "miamiheat://screen/team/schedule"
+                        },
+                        "created_at": "2024-07-09T19:09:20.998Z",
+                        "created_by": "blt34f1e9fe2a5e84b3",
+                        "cta_link": "https://app.bitrise.io/app/cf2fb725-390a-4acd-b940-122755b0310a/build/09f95232-93c6-4cc7-8d60-4e85d5be5a20/artifact/0ca977a76ba1a4c7/p/ba4af01dfdcbc61a8086670131ff9b25",
+                        "description": "2023/24",
+                        "sponsor": {
+                            "sponsor_text": "",
+                            "sponsor_icon": null,
+                            "cta_link": ""
+                        },
+                        "tags": [],
+                        "title": "Copy of FULL HEAT SCHEDULE",
+                        "updated_at": "2024-07-11T08:31:01.930Z",
+                        "updated_by": "blt34f1e9fe2a5e84b3",
+                        "publish_details": {
+                            "time": "2024-07-11T08:31:06.513Z",
+                            "user": "blt34f1e9fe2a5e84b3",
+                            "environment": "bltabd1ca10364db0c0",
+                            "locale": "en-us"
+                        }
                     }
                 ]
             }

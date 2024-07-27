@@ -21,13 +21,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -48,6 +54,7 @@ import com.example.listandgamecards.Utils.formatTime
 import com.example.listandgamecards.models.Entry
 import com.example.listandgamecards.usecases.getNextGameIndex
 import com.example.listandgamecards.usecases.getSortedSchedule
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -63,9 +70,18 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
     val today = LocalDate.now()
     val nextGameIndex = getNextGameIndex(sortedSchedule)
 
+    val monthList = groupedSchedule.keys.toList()
+    var currentMonthIndex = remember { mutableStateOf(monthList.indexOfFirst { month ->
+        sortedSchedule.getOrNull(nextGameIndex)?.let {
+            formatDateToMonthYear(it.gametime) == month
+        } ?: false
+    }.coerceAtLeast(0)) }
+
     LaunchedEffect(nextGameIndex) {
         if (nextGameIndex != -1) {
-            listState.scrollToItem(nextGameIndex)
+            coroutineScope.launch {
+                listState.scrollToItem(nextGameIndex)
+            }
         }
     }
 
@@ -84,11 +100,47 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = month,
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    ) {
+                        IconButton(onClick = {
+                            if (currentMonthIndex.value > 0) {
+                                currentMonthIndex.value -= 1
+                                val previousMonth = monthList[currentMonthIndex.value]
+                                val scrollIndex = sortedSchedule.indexOfFirst {
+                                    formatDateToMonthYear(it.gametime) == previousMonth
+                                }
+                                coroutineScope.launch {
+                                    listState.animateScrollToItem(scrollIndex)
+                                }
+                            }
+                        }) {
+                            Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Previous Month", tint = Color.White)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = month,
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(onClick = {
+                            if (currentMonthIndex.value < monthList.size - 1) {
+                                currentMonthIndex.value += 1
+                                val nextMonth = monthList[currentMonthIndex.value]
+                                val scrollIndex = sortedSchedule.indexOfFirst {
+                                    formatDateToMonthYear(it.gametime) == nextMonth
+                                }
+                                coroutineScope.launch {
+                                    listState.animateScrollToItem(scrollIndex)
+                                }
+                            }
+                        }) {
+                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Next Month", tint = Color.White)
+                        }
+                    }
                 }
             }
             itemsIndexed(schedules) { index, scheduleItem ->
