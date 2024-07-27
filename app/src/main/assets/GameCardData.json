@@ -112,7 +112,7 @@
                     },
                     "leading_icon": null
                 },
-                "cta_link": "miamiheat://screen/buy_ticket"
+                "cta_link": "https://www.nba.com/heat/tickets/miami-heat-tickets"
             }
         },
         "future_game": {
@@ -254,7 +254,7 @@
                                 "leading_theme_icons": [],
                                 "trailing_theme_icons": []
                             },
-                            "cta_link": "miamiheat://screen/team/schedule"
+                            "cta_link": "https://www.nba.com/heat/schedule"
                         },
                         "created_at": "2024-06-26T06:13:31.497Z",
                         "created_by": "blt34f1e9fe2a5e84b3",

@@ -1,5 +1,7 @@
 package com.example.listandgamecards.View
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -21,13 +23,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -86,6 +91,7 @@ fun GamesTab(games: Entry, schedule: List<Schedule>, team: List<Team>) {
 
 @Composable
 fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedule>, team: List<Team>) {
+    val context = LocalContext.current
     val promotionCard = promotionCards.firstOrNull { it.position.toInt() == 2 }
 
     when(promotionCard != null){
@@ -146,7 +152,11 @@ fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedu
 
                             Card(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(card.button.ctaLink))
+                                        context.startActivity(intent)
+                                    },
                                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                                 colors = CardDefaults.cardColors(Color(0xFFFFC108)),
                                 shape = RoundedCornerShape(50)
@@ -320,9 +330,11 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team: List<Team>) {
+    val context = LocalContext.current
     // Filter and sort the schedule for upcoming games (gameStatus = 1)
     val upcomingGames = schedule
         .filter {
@@ -359,7 +371,6 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
         val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
 
         val duration = calculateDuration(scheduleItem.gametime)
-
         val formattedTime = formatTimeComponents(duration)
 
         Card(
@@ -487,12 +498,15 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(8.dp)
-                ) {
+                ){
 
                     Row(
                         modifier = Modifier
                             .padding(bottom = 8.dp)
-                            .background(Color(0xFF000000).copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                            .background(
+                                Color(0xFF000000).copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
@@ -541,7 +555,11 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
 
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(upcomingGame.button.ctaLink))
+                                context.startActivity(intent)
+                            },
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                         colors = CardDefaults.cardColors(Color.White),
                         shape = RoundedCornerShape(50)
@@ -613,6 +631,8 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
         val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
         val gameStatus = scheduleItem.st
         val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
+        val duration = calculateDuration(scheduleItem.gametime)
+        val formattedTime = formatTimeComponents(duration)
 
         Card(
             modifier = Modifier
@@ -740,7 +760,58 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                         .align(Alignment.BottomStart)
                         .padding(8.dp)
                 ) {
-
+                    Row(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .background(
+                                Color(0xFF000000).copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ){
+                        Text(
+                            text = formattedTime.split(" | ")[0],
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Divider(
+                            color = Color.White,
+                            modifier = Modifier
+                                .height(14.dp)
+                                .width(1.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = formattedTime.split(" | ")[1],
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Divider(
+                            color = Color.White,
+                            modifier = Modifier
+                                .height(14.dp)
+                                .width(1.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = formattedTime.split(" | ")[2],
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                    }
                 }
             }
         }

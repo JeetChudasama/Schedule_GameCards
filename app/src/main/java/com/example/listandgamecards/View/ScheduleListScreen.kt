@@ -1,5 +1,7 @@
 package com.example.listandgamecards.View
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -39,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +65,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalCoilApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
+    val context = LocalContext.current
     val sortedSchedule = getSortedSchedule(schedule)
     val groupedSchedule = sortedSchedule.groupBy { formatDateToMonthYear(it.gametime) }
 
@@ -317,7 +321,11 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                         if (gameStatus.toInt() == 1) {
                             Card(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.upcomingGame.button.ctaLink))
+                                        context.startActivity(intent)
+                                    },
                                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                                 colors = CardDefaults.cardColors(Color.White),
                                 shape = RoundedCornerShape(50)
