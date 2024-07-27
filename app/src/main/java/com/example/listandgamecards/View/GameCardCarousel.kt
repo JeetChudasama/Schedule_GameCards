@@ -3,6 +3,7 @@ package com.example.listandgamecards.View
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,8 +43,11 @@ import com.example.listandgamecards.models.UpcomingGame
 import com.example.listandgamecards.Utils.formatDateToCustomFormat
 import com.example.listandgamecards.Utils.formatTime
 import com.example.listandgamecards.models.PromotionCard
+import com.example.listandgamecards.usecases.calculateDuration
 import com.example.listandgamecards.usecases.filterScheduleByStatus
+import com.example.listandgamecards.usecases.formatTimeComponents
 import com.example.listandgamecards.usecases.getLatestPastGame
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -321,16 +325,25 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
 fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team: List<Team>) {
     // Filter and sort the schedule for upcoming games (gameStatus = 1)
     val upcomingGames = schedule
-        .filter { it.st.toInt() == 1 }
-        .sortedBy {
-            try {
+        .filter {
+            it.st.toInt() == 1 && try {
                 val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
                     .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
                     .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
-                zonedDateTime.toLocalDate() // Get local date for sorting
+                val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
+                zonedDateTime.isAfter(now)
             } catch (e: Exception) {
-                // Handle parse exception if necessary, e.g., logging
-                LocalDate.MIN // Use a default date in case of parse error
+                false // Exclude games if there is a parsing error
+            }
+        }
+        .sortedBy {
+            try {
+                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(ZoneId.systemDefault())
+                zonedDateTime.toLocalDate()
+            } catch (e: Exception) {
+                LocalDate.MIN
             }
         }
 
@@ -344,7 +357,10 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
         val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
         val gameStatus = scheduleItem.st
         val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
-        val uriHandler = LocalUriHandler.current
+
+        val duration = calculateDuration(scheduleItem.gametime)
+
+        val formattedTime = formatTimeComponents(duration)
 
         Card(
             modifier = Modifier
@@ -472,6 +488,57 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                         .align(Alignment.BottomStart)
                         .padding(8.dp)
                 ) {
+
+                    Row(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .background(Color(0xFF000000).copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ){
+                        Text(
+                            text = formattedTime.split(" | ")[0],
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Divider(
+                            color = Color.White,
+                            modifier = Modifier
+                                .height(14.dp)
+                                .width(1.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = formattedTime.split(" | ")[1],
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Divider(
+                            color = Color.White,
+                            modifier = Modifier
+                                .height(14.dp)
+                                .width(1.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = formattedTime.split(" | ")[2],
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                    }
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -514,16 +581,25 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
 fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List<Team>) {
     // Filter and sort the schedule for future games (gameStatus = 1)
     val futureGames = schedule
-        .filter { it.st.toInt() == 1 }
-        .sortedBy {
-            try {
+        .filter {
+            it.st.toInt() == 1 && try {
                 val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
                     .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
                     .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
-                zonedDateTime.toLocalDate() // Get local date for sorting
+                val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
+                zonedDateTime.isAfter(now)
             } catch (e: Exception) {
-                // Handle parse exception if necessary, e.g., logging
-                LocalDate.MIN // Use a default date in case of parse error
+                false // Exclude games if there is a parsing error
+            }
+        }
+        .sortedBy {
+            try {
+                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(ZoneId.systemDefault())
+                zonedDateTime.toLocalDate()
+            } catch (e: Exception) {
+                LocalDate.MIN
             }
         }
 

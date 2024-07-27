@@ -3,6 +3,7 @@ package com.example.listandgamecards.usecases
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.listandgamecards.models.Schedule
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,4 +29,28 @@ fun getLatestPastGame(schedule: List<Schedule>): Schedule? {
                 LocalDate.MIN // Use a default date in case of parse error
             }
         }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun calculateDuration(gametime: String): Duration {
+    val gameDateTime = LocalDateTime.parse(gametime, DateTimeFormatter.ISO_DATE_TIME)
+        .atZone(ZoneId.of("UTC"))
+        .withZoneSameInstant(ZoneId.systemDefault())
+
+    val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
+    return Duration.between(now, gameDateTime)
+}
+
+// Function to format the time components as two-digit strings
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatTimeComponents(duration: Duration): String {
+    val days = duration.toDays()
+    val hours = duration.toHours() % 24
+    val minutes = duration.toMinutes() % 60
+
+    val daysFormatted = String.format("%02d", days)
+    val hoursFormatted = String.format("%02d", hours)
+    val minutesFormatted = String.format("%02d", minutes)
+
+    return "$daysFormatted | $hoursFormatted | $minutesFormatted"
 }
