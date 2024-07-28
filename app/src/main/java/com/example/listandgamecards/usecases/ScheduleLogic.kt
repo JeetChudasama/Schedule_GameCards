@@ -62,13 +62,44 @@ fun getNextGameIndex(sortedSchedule: List<Schedule>): Int {
         }
     }
 }
+fun updateGameClockAndQuarter(clock: String, gameQuarter: String): Pair<String, String> {
+    val clockParts = clock.split(":")
+    val minutes = clockParts.getOrNull(0)?.toIntOrNull() ?: 0
+    val seconds = clockParts.getOrNull(1)?.toDoubleOrNull() ?: 0.0
 
-fun updateGameClock(currentClock: String): String {
-    val sdf = SimpleDateFormat("mm:ss.S")
-    val date = sdf.parse(currentClock)
-    val newTime = date.time + 10_000 // Add 10 seconds
-    return sdf.format(Date(newTime))
+    var updatedGameQuarter = gameQuarter
+
+    if (updatedGameQuarter.contains("QTR")) {
+        if (minutes >= 10) {
+            updatedGameQuarter = when (updatedGameQuarter) {
+                "QTR 1" -> "Halftime 1"
+                "QTR 2" -> "Halftime 2"
+                "QTR 3" -> "Halftime 3"
+                "QTR 4" -> "FINAL"
+                else -> updatedGameQuarter
+            }
+            return Pair("00:00.0", updatedGameQuarter)
+        }
+    } else if (updatedGameQuarter.contains("Halftime")) {
+        if (minutes >= 15) {
+            updatedGameQuarter = when (updatedGameQuarter) {
+                "Halftime" -> "QTR 2"
+                "Halftime 2" -> "QTR 3"
+                "Halftime 3" -> "QTR 4"
+                else -> "FINAL"
+            }
+            return Pair("00:00.0", updatedGameQuarter)
+        }
+    }
+
+    val updatedSeconds = seconds + 10
+    val updatedMinutes = minutes + (updatedSeconds / 60).toInt()
+    val newSeconds = updatedSeconds % 60
+    val newClock = "%02d:%04.1f".format(updatedMinutes, newSeconds)
+
+    return Pair(newClock, updatedGameQuarter)
 }
+
 
 
 

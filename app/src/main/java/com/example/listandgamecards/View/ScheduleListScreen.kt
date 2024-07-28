@@ -35,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +60,7 @@ import com.example.listandgamecards.Utils.formatTime
 import com.example.listandgamecards.models.Entry
 import com.example.listandgamecards.usecases.getNextGameIndex
 import com.example.listandgamecards.usecases.getSortedSchedule
-import com.example.listandgamecards.usecases.updateGameClock
+import com.example.listandgamecards.usecases.updateGameClockAndQuarter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -79,12 +80,23 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
     val today = LocalDate.now()
     val nextGameIndex = getNextGameIndex(sortedSchedule)
 
-    val monthList = groupedSchedule.keys.toList()
-    var currentMonthIndex = remember { mutableStateOf(monthList.indexOfFirst { month ->
-        sortedSchedule.getOrNull(nextGameIndex)?.let {
-            formatDateToMonthYear(it.gametime) == month
-        } ?: false
-    }.coerceAtLeast(0)) }
+    val months = groupedSchedule.keys.toList()
+    var currentMonthIndex by remember { mutableStateOf(months.indexOf(formatDateToMonthYear(today.toString()))) }
+
+    val firstVisibleItemMonth by remember {
+        derivedStateOf {
+            val firstVisibleItem = listState.firstVisibleItemIndex
+            groupedSchedule.entries.find { (_, schedules) ->
+                schedules.any { schedule -> sortedSchedule.indexOf(schedule) == firstVisibleItem }
+            }?.key
+        }
+    }
+
+    LaunchedEffect(firstVisibleItemMonth) {
+        firstVisibleItemMonth?.let { month ->
+            currentMonthIndex = months.indexOf(month)
+        }
+    }
 
     LaunchedEffect(nextGameIndex) {
         if (nextGameIndex != -1) {
@@ -117,14 +129,16 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                             .padding(horizontal = 16.dp)
                     ) {
                         IconButton(onClick = {
-                            if (currentMonthIndex.value > 0) {
-                                currentMonthIndex.value -= 1
-                                val previousMonth = monthList[currentMonthIndex.value]
-                                val scrollIndex = sortedSchedule.indexOfFirst {
-                                    formatDateToMonthYear(it.gametime) == previousMonth
+                            if (currentMonthIndex > 0) {
+                                currentMonthIndex -= 1
+                                val targetMonth = months[currentMonthIndex]
+                                val targetIndex = groupedSchedule.values.flatten().indexOfFirst {
+                                    formatDateToMonthYear(it.gametime) == targetMonth
                                 }
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(scrollIndex)
+                                if (targetIndex != -1) {
+                                    coroutineScope.launch {
+                                        listState.animateScrollToItem(targetIndex)
+                                    }
                                 }
                             }
                         }) {
@@ -138,14 +152,16 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = {
-                            if (currentMonthIndex.value < monthList.size - 1) {
-                                currentMonthIndex.value += 1
-                                val nextMonth = monthList[currentMonthIndex.value]
-                                val scrollIndex = sortedSchedule.indexOfFirst {
-                                    formatDateToMonthYear(it.gametime) == nextMonth
+                            if (currentMonthIndex < months.size - 1) {
+                                currentMonthIndex += 1
+                                val targetMonth = months[currentMonthIndex]
+                                val targetIndex = groupedSchedule.values.flatten().indexOfFirst {
+                                    formatDateToMonthYear(it.gametime) == targetMonth
                                 }
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(scrollIndex)
+                                if (targetIndex != -1) {
+                                    coroutineScope.launch {
+                                        listState.animateScrollToItem(targetIndex)
+                                    }
                                 }
                             }
                         }) {
@@ -167,15 +183,53 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                 var homeTeamScore by remember { mutableStateOf(scheduleItem.h.s) }
                 var visitorTeamScore by remember { mutableStateOf(scheduleItem.v.s) }
 
+//                fun updateGameClockAndQuarter(clock: String): String {
+//                    val clockParts = clock.split(":")
+//                    val minutes = clockParts.getOrNull(0)?.toIntOrNull() ?: 0
+//                    val seconds = clockParts.getOrNull(1)?.toDoubleOrNull() ?: 0.0
+//
+//                    if (gameQuarter.contains("QTR")) {
+//                        if (minutes >= 10) {
+//                            gameQuarter = when (gameQuarter) {
+//                                "QTR 1" -> "Halftime"
+//                                "QTR 2" -> "Halftime"
+//                                "QTR 3" -> "Halftime"
+//                                "QTR 4" -> "FINAL"
+//                                else -> gameQuarter
+//                            }
+//                            return "00:00.0"
+//                        }
+//                    } else if (gameQuarter == "Halftime") {
+//                        if (minutes >= 15) {
+//                            gameQuarter = when (gameQuarter) {
+//                                "Halftime" -> "QTR 2"
+//                                "QTR 2 Halftime" -> "QTR 3"
+//                                "QTR 3 Halftime" -> "QTR 4"
+//                                else -> "FINAL"
+//                            }
+//                            return "00:00.0"
+//                        }
+//                    }
+//
+//                    val updatedSeconds = seconds + 10
+//                    val updatedMinutes = minutes + (updatedSeconds / 60).toInt()
+//                    val newSeconds = updatedSeconds % 60
+//                    return "%02d:%04.1f".format(updatedMinutes, newSeconds)
+//                }
+
                 // Update game clock every 10 seconds
                 LaunchedEffect(gameStatus) {
                     while (gameStatus.toInt() == 2) {
                         delay(10_000L)
-                        gameClock = updateGameClock(gameClock)
-                        if ((0..1).random() == 0) {
-                            homeTeamScore = (homeTeamScore?.toIntOrNull()?.plus(1) ?: 0).toString()
-                        } else {
-                            visitorTeamScore = (visitorTeamScore?.toIntOrNull()?.plus(1) ?: 0).toString()
+                        val (newClock, newQuarter) = updateGameClockAndQuarter(gameClock, gameQuarter)
+                        gameClock = newClock
+                        gameQuarter = newQuarter
+                        if (!newQuarter.contains("Halftime")) {
+                            if ((0..1).random() == 0) {
+                                homeTeamScore = (homeTeamScore?.toIntOrNull()?.plus(1) ?: 0).toString()
+                            } else {
+                                visitorTeamScore = (visitorTeamScore?.toIntOrNull()?.plus(1) ?: 0).toString()
+                            }
                         }
                     }
                 }
