@@ -4,10 +4,13 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.listandgamecards.Utils.formatDateToMonthYear
 import com.example.listandgamecards.models.Schedule
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 // ScheduleBusinessLogic.kt
 @RequiresApi(Build.VERSION_CODES.O)
@@ -59,3 +62,14 @@ fun getNextGameIndex(sortedSchedule: List<Schedule>): Int {
         }
     }
 }
+
+fun updateGameClock(currentClock: String): String {
+    val sdf = SimpleDateFormat("mm:ss.S")
+    val date = sdf.parse(currentClock)
+    val newTime = date.time + 10_000 // Add 10 seconds
+    return sdf.format(Date(newTime))
+}
+
+
+
+

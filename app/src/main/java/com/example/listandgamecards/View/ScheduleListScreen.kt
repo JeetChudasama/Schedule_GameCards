@@ -35,9 +35,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,9 +59,12 @@ import com.example.listandgamecards.Utils.formatTime
 import com.example.listandgamecards.models.Entry
 import com.example.listandgamecards.usecases.getNextGameIndex
 import com.example.listandgamecards.usecases.getSortedSchedule
+import com.example.listandgamecards.usecases.updateGameClock
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.random.Random
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalCoilApi::class, ExperimentalFoundationApi::class)
@@ -107,7 +112,9 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
                         IconButton(onClick = {
                             if (currentMonthIndex.value > 0) {
@@ -150,14 +157,28 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
             itemsIndexed(schedules) { index, scheduleItem ->
                 val homeTeam = team.find { it.tid == scheduleItem.h.tid }
                 val visitorTeam = team.find { it.tid == scheduleItem.v.tid }
-                val tid =
-                    team.find { it.tid == scheduleItem.h.tid || it.tid == scheduleItem.v.tid }?.tid
+                val tid = team.find { it.tid == scheduleItem.h.tid || it.tid == scheduleItem.v.tid }?.tid
                 val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
                 val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
                 val gameStatus = scheduleItem.st
-                val gameQuarter = scheduleItem.stt // Game quarter
-                val gameClock = scheduleItem.cl
-                val uriHandler = LocalUriHandler.current
+                var gameQuarter by remember { mutableStateOf(scheduleItem.stt) }
+                val initialGameClock = scheduleItem.cl
+                var gameClock by remember { mutableStateOf(initialGameClock) }
+                var homeTeamScore by remember { mutableStateOf(scheduleItem.h.s) }
+                var visitorTeamScore by remember { mutableStateOf(scheduleItem.v.s) }
+
+                // Update game clock every 10 seconds
+                LaunchedEffect(gameStatus) {
+                    while (gameStatus.toInt() == 2) {
+                        delay(10_000L)
+                        gameClock = updateGameClock(gameClock)
+                        if ((0..1).random() == 0) {
+                            homeTeamScore = (homeTeamScore?.toIntOrNull()?.plus(1) ?: 0).toString()
+                        } else {
+                            visitorTeamScore = (visitorTeamScore?.toIntOrNull()?.plus(1) ?: 0).toString()
+                        }
+                    }
+                }
 
                 Card(
                     modifier = Modifier
@@ -212,7 +233,7 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                             Text(
                                 text = when (gameStatus.toInt()) {
                                     1 -> formatTime(scheduleItem.gametime) // Adjust based on actual requirements
-                                    2 -> scheduleItem.stt + "   |   " + gameClock
+                                    2 -> "$gameQuarter   |   $gameClock"
                                     3 -> "FINAL"
                                     else -> "N/A"
                                 },
@@ -260,7 +281,7 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
 
                             when (gameStatus.toInt()) {
                                 1 -> visitorTeam?.ta
-                                2 -> scheduleItem.v.s
+                                2 -> visitorTeamScore
                                 3 -> scheduleItem.v.s
                                 else -> "N/A"
                             }?.let {
@@ -281,7 +302,7 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
 
                             when (gameStatus.toInt()) {
                                 1 -> homeTeam?.ta
-                                2 -> scheduleItem.h.s
+                                2 -> homeTeamScore
                                 3 -> scheduleItem.h.s
                                 else -> "N/A"
                             }?.let {
@@ -323,7 +344,10 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.upcomingGame.button.ctaLink))
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(game.upcomingGame.button.ctaLink)
+                                        )
                                         context.startActivity(intent)
                                     },
                                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
