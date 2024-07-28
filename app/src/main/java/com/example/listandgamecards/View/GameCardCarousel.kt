@@ -27,7 +27,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,6 +56,7 @@ import com.example.listandgamecards.usecases.calculateDuration
 import com.example.listandgamecards.usecases.filterScheduleByStatus
 import com.example.listandgamecards.usecases.formatTimeComponents
 import com.example.listandgamecards.usecases.getLatestPastGame
+import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -98,8 +103,8 @@ fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedu
         true ->
             Card(
                 modifier = Modifier
-                    .width(200.dp)
-                    .height(200.dp),
+                    .width(220.dp)
+                    .height(220.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                 shape = RoundedCornerShape(16.dp)
             ){
@@ -118,14 +123,15 @@ fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedu
                         Column(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
-                                .padding(8.dp)
+                                .padding(8.dp),
+                            verticalArrangement = Arrangement.SpaceBetween
                         ){
 
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
+                                    .fillMaxWidth()
+                                    .padding(bottom = 4.dp),
+                                horizontalArrangement = Arrangement.Start
                             ){
                                 Text(text = card.title, color = Color.White,
                                     style = TextStyle(
@@ -139,12 +145,11 @@ fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedu
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = 8.dp),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
+                                horizontalArrangement = Arrangement.Start
                             ){
                                 Text(text = "2023/24", color = Color.White,
                                     style = TextStyle(
-                                        fontSize = 10.sp,
+                                        fontSize = 12.sp,
                                         fontWeight = FontWeight.Normal
                                     )
                                 )
@@ -154,11 +159,14 @@ fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedu
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(card.button.ctaLink))
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(card.button.ctaLink)
+                                        )
                                         context.startActivity(intent)
                                     },
                                 elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                                colors = CardDefaults.cardColors(Color(0xFFFFC108)),
+                                colors = CardDefaults.cardColors(Color(0xFFFFAB00)),
                                 shape = RoundedCornerShape(50)
                             ) {
                                 Row(
@@ -205,8 +213,8 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
 
         Card(
             modifier = Modifier
-                .width(200.dp)
-                .height(200.dp),
+                .width(220.dp)
+                .height(220.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -231,7 +239,7 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
@@ -241,7 +249,7 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                                 .size(30.dp)
                                 .align(Alignment.CenterVertically)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+//                        Spacer(modifier = Modifier.width(8.dp))
 
                         when (gameStatus.toInt()) {
                             1 -> visitorTeam?.ta
@@ -255,12 +263,12 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+//                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = displayVS,
                             color = Color.White
                         ) // If the app team is the Home Team, display "VS" or If the app team is the Visitor Team, display "@"
-                        Spacer(modifier = Modifier.width(8.dp))
+//                        Spacer(modifier = Modifier.width(8.dp))
 
                         when (gameStatus.toInt()) {
                             1 -> homeTeam?.ta
@@ -274,7 +282,7 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+//                        Spacer(modifier = Modifier.width(8.dp))
                         Image(
                             painter = rememberAsyncImagePainter(homeTeam?.logo),
                             contentDescription = "home team",
@@ -294,7 +302,7 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                             visitorTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.ExtraBold) }
                         }
-                        Spacer(modifier = Modifier.width(96.dp))
+                        Spacer(modifier = Modifier.width(110.dp))
                         if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
                             homeTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.ExtraBold) }
@@ -306,7 +314,7 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                         modifier = Modifier
                             .fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-                        colors = CardDefaults.cardColors(Color(0xFFFFC107)),
+                        colors = CardDefaults.cardColors(Color(0xFFFFAB00)),
                         shape = RoundedCornerShape(50)
                     ) {
                         Row(
@@ -340,7 +348,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
         .filter {
             it.st.toInt() == 1 && try {
                 val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                    .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
                     .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
                 val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
                 zonedDateTime.isAfter(now)
@@ -351,7 +359,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
         .sortedBy {
             try {
                 val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("UTC"))
+                    .atZone(ZoneId.of("Asia/Kolkata"))
                     .withZoneSameInstant(ZoneId.systemDefault())
                 zonedDateTime.toLocalDate()
             } catch (e: Exception) {
@@ -370,13 +378,19 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
         val gameStatus = scheduleItem.st
         val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
 
-        val duration = calculateDuration(scheduleItem.gametime)
+        var duration by remember { mutableStateOf(calculateDuration(scheduleItem.gametime)) }
+        LaunchedEffect(scheduleItem.gametime) {
+            while (true) {
+                delay(60_000L) // 1 minute in milliseconds
+                duration = calculateDuration(scheduleItem.gametime)
+            }
+        }
         val formattedTime = formatTimeComponents(duration)
 
         Card(
             modifier = Modifier
-                .width(200.dp)
-                .height(200.dp),
+                .width(220.dp)
+                .height(220.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -399,7 +413,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 4.dp)
                     ){
                         Image(
                             painter = rememberAsyncImagePainter(visitorTeam?.logo),
@@ -420,10 +434,10 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 1.dp)
+                            .padding(bottom = 1.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ){
-                        homeTeam?.ta?.let {
+                        visitorTeam?.ta?.let {
                             Text(
                                 text = it,
                                 color = Color.Black,
@@ -432,16 +446,16 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = displayVS,
                             color = Color.Black,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.ExtraBold
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(5.dp))
 
-                        visitorTeam?.ta?.let {
+                        homeTeam?.ta?.let {
                             Text(
                                 text = it,
                                 color = Color.Black,
@@ -458,7 +472,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                             Text(
                                 text = displayHA,
                                 color = Color.DarkGray,
-                                fontSize = 7.sp
+                                fontSize = 9.sp
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Divider(
@@ -474,7 +488,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                             Text(
                                 text = formatDateToCustomFormat(scheduleItem.gametime),
                                 color = Color.DarkGray,
-                                fontSize = 7.sp
+                                fontSize = 9.sp
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Divider(
@@ -488,7 +502,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                         Text(
                             text = formatTime(scheduleItem.gametime),
                             color = Color.DarkGray,
-                            fontSize = 7.sp
+                            fontSize = 9.sp
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                     }
@@ -499,65 +513,105 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
                         .align(Alignment.BottomStart)
                         .padding(8.dp)
                 ){
-
-                    Row(
+                    Card(
                         modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .background(
-                                Color(0xFF000000).copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
+                            .padding(bottom = 8.dp),
+                        colors = CardDefaults.cardColors(Color(0xFF000000).copy(alpha = 0.7f)),
+                        shape = RoundedCornerShape(5.dp)
                     ){
-                        Text(
-                            text = formattedTime.split(" | ")[0],
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Normal
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Divider(
-                            color = Color.White,
+                        Row (
                             modifier = Modifier
-                                .height(14.dp)
-                                .width(1.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formattedTime.split(" | ")[1],
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Normal
+                                .padding(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Text(
+                                    text = formattedTime.split(" | ")[0],
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                                Text(
+                                    text = "DAYS",
+                                    color = Color.LightGray,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Divider(
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .width(1.dp)
                             )
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Divider(
-                            color = Color.White,
-                            modifier = Modifier
-                                .height(14.dp)
-                                .width(1.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formattedTime.split(" | ")[2],
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Normal
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Text(
+                                    text = formattedTime.split(" | ")[1],
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                                Text(
+                                    text = "HRS",
+                                    color = Color.LightGray,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Divider(
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .width(1.dp)
                             )
-                        )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Text(
+                                    text = formattedTime.split(" | ")[2],
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                                Text(
+                                    text = "MIN",
+                                    color = Color.LightGray,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                        }
                     }
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(upcomingGame.button.ctaLink))
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(upcomingGame.button.ctaLink)
+                                )
                                 context.startActivity(intent)
                             },
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
@@ -636,8 +690,8 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
 
         Card(
             modifier = Modifier
-                .width(200.dp)
-                .height(200.dp),
+                .width(220.dp)
+                .height(220.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -660,7 +714,7 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 4.dp)
                     ){
                         Image(
                             painter = rememberAsyncImagePainter(visitorTeam?.logo),
@@ -684,7 +738,7 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                             .fillMaxWidth()
                             .padding(bottom = 1.dp)
                     ){
-                        homeTeam?.ta?.let {
+                        visitorTeam?.ta?.let {
                             Text(
                                 text = it,
                                 color = Color.White,
@@ -693,16 +747,16 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = displayVS,
                             color = Color.White,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.ExtraBold
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
 
-                        visitorTeam?.ta?.let {
+                        homeTeam?.ta?.let {
                             Text(
                                 text = it,
                                 color = Color.White,
@@ -719,7 +773,7 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                             Text(
                                 text = displayHA,
                                 color = Color.White,
-                                fontSize = 7.sp
+                                fontSize = 9.sp
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Divider(
@@ -735,7 +789,7 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                             Text(
                                 text = formatDateToCustomFormat(scheduleItem.gametime),
                                 color = Color.White,
-                                fontSize = 7.sp
+                                fontSize = 9.sp
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Divider(
@@ -749,7 +803,7 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                         Text(
                             text = formatTime(scheduleItem.gametime),
                             color = Color.White,
-                            fontSize = 7.sp
+                            fontSize = 9.sp
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                     }
@@ -760,57 +814,95 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
                         .align(Alignment.BottomStart)
                         .padding(8.dp)
                 ) {
-                    Row(
+                    Card(
                         modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .background(
-                                Color(0xFF000000).copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
+                            .padding(bottom = 10.dp, start = 10.dp),
+                        colors = CardDefaults.cardColors(Color(0xFF000000).copy(alpha = 0.7f)),
+                        shape = RoundedCornerShape(5.dp)
                     ){
-                        Text(
-                            text = formattedTime.split(" | ")[0],
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Normal
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Divider(
-                            color = Color.White,
+                        Row (
                             modifier = Modifier
-                                .height(14.dp)
-                                .width(1.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formattedTime.split(" | ")[1],
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Normal
+                                .padding(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Text(
+                                    text = formattedTime.split(" | ")[0],
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                                Text(
+                                    text = "DAYS",
+                                    color = Color.LightGray,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Divider(
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .width(1.dp)
                             )
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Divider(
-                            color = Color.White,
-                            modifier = Modifier
-                                .height(14.dp)
-                                .width(1.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = formattedTime.split(" | ")[2],
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Normal
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Text(
+                                    text = formattedTime.split(" | ")[1],
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                                Text(
+                                    text = "HRS",
+                                    color = Color.LightGray,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Divider(
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .width(1.dp)
                             )
-                        )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Text(
+                                    text = formattedTime.split(" | ")[2],
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                                Text(
+                                    text = "MIN",
+                                    color = Color.LightGray,
+                                    style = TextStyle(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

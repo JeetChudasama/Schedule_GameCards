@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,7 +82,7 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
     val nextGameIndex = getNextGameIndex(sortedSchedule)
 
     val months = groupedSchedule.keys.toList()
-    var currentMonthIndex by remember { mutableStateOf(months.indexOf(formatDateToMonthYear(today.toString()))) }
+    var currentMonthIndex by rememberSaveable { mutableStateOf(months.indexOf(formatDateToMonthYear(today.toString()))) }
 
     val firstVisibleItemMonth by remember {
         derivedStateOf {
@@ -177,45 +178,11 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                 val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
                 val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
                 val gameStatus = scheduleItem.st
-                var gameQuarter by remember { mutableStateOf(scheduleItem.stt) }
+                var gameQuarter by rememberSaveable { mutableStateOf(scheduleItem.stt) }
                 val initialGameClock = scheduleItem.cl
-                var gameClock by remember { mutableStateOf(initialGameClock) }
-                var homeTeamScore by remember { mutableStateOf(scheduleItem.h.s) }
-                var visitorTeamScore by remember { mutableStateOf(scheduleItem.v.s) }
-
-//                fun updateGameClockAndQuarter(clock: String): String {
-//                    val clockParts = clock.split(":")
-//                    val minutes = clockParts.getOrNull(0)?.toIntOrNull() ?: 0
-//                    val seconds = clockParts.getOrNull(1)?.toDoubleOrNull() ?: 0.0
-//
-//                    if (gameQuarter.contains("QTR")) {
-//                        if (minutes >= 10) {
-//                            gameQuarter = when (gameQuarter) {
-//                                "QTR 1" -> "Halftime"
-//                                "QTR 2" -> "Halftime"
-//                                "QTR 3" -> "Halftime"
-//                                "QTR 4" -> "FINAL"
-//                                else -> gameQuarter
-//                            }
-//                            return "00:00.0"
-//                        }
-//                    } else if (gameQuarter == "Halftime") {
-//                        if (minutes >= 15) {
-//                            gameQuarter = when (gameQuarter) {
-//                                "Halftime" -> "QTR 2"
-//                                "QTR 2 Halftime" -> "QTR 3"
-//                                "QTR 3 Halftime" -> "QTR 4"
-//                                else -> "FINAL"
-//                            }
-//                            return "00:00.0"
-//                        }
-//                    }
-//
-//                    val updatedSeconds = seconds + 10
-//                    val updatedMinutes = minutes + (updatedSeconds / 60).toInt()
-//                    val newSeconds = updatedSeconds % 60
-//                    return "%02d:%04.1f".format(updatedMinutes, newSeconds)
-//                }
+                var gameClock by rememberSaveable { mutableStateOf(initialGameClock) }
+                var homeTeamScore by rememberSaveable { mutableStateOf(scheduleItem.h.s) }
+                var visitorTeamScore by rememberSaveable { mutableStateOf(scheduleItem.v.s) }
 
                 // Update game clock every 10 seconds
                 LaunchedEffect(gameStatus) {
@@ -321,17 +288,17 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp),
-                            horizontalArrangement = Arrangement.Center,
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Image(
                                 painter = rememberAsyncImagePainter(visitorTeam?.logo),
                                 contentDescription = "visiter team",
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .size(35.dp)
                                     .align(Alignment.CenterVertically)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+//                            Spacer(modifier = Modifier.width(8.dp))
 
                             when (gameStatus.toInt()) {
                                 1 -> visitorTeam?.ta
@@ -347,12 +314,12 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(8.dp))
+//                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = displayVS,
                                 color = Color.White
                             )    //If the app team is the Home Team, display "VS" or If the app team is the Visitor Team, display "@"
-                            Spacer(modifier = Modifier.width(8.dp))
+//                            Spacer(modifier = Modifier.width(8.dp))
 
                             when (gameStatus.toInt()) {
                                 1 -> homeTeam?.ta
@@ -368,12 +335,12 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(8.dp))
+//                            Spacer(modifier = Modifier.width(8.dp))
                             Image(
                                 painter = rememberAsyncImagePainter(homeTeam?.logo),
                                 contentDescription = "home team",
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .size(35.dp)
                                     .align(Alignment.CenterVertically)
                             )
                         }
@@ -387,7 +354,7 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                                 visitorTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.ExtraBold) }
                             }
-                            Spacer(modifier = Modifier.width(96.dp))
+                            Spacer(modifier = Modifier.width(180.dp))
                             if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
                                 homeTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.ExtraBold) }

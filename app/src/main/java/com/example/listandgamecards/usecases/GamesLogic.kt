@@ -21,7 +21,7 @@ fun getLatestPastGame(schedule: List<Schedule>): Schedule? {
         .maxByOrNull {
             try {
                 val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                    .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
                     .withZoneSameInstant(userZoneId) // Convert to user's local time zone
                 zonedDateTime.toLocalDate() // Get local date
             } catch (e: Exception) {
@@ -34,7 +34,7 @@ fun getLatestPastGame(schedule: List<Schedule>): Schedule? {
 @RequiresApi(Build.VERSION_CODES.O)
 fun calculateDuration(gametime: String): Duration {
     val gameDateTime = LocalDateTime.parse(gametime, DateTimeFormatter.ISO_DATE_TIME)
-        .atZone(ZoneId.of("UTC"))
+        .atZone(ZoneId.of("Asia/Kolkata"))
         .withZoneSameInstant(ZoneId.systemDefault())
 
     val now = LocalDateTime.now().atZone(ZoneId.systemDefault())

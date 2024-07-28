@@ -19,7 +19,7 @@ fun getSortedSchedule(schedule: List<Schedule>): List<Schedule> {
     return schedule.sortedBy {
         try {
             val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
                 .withZoneSameInstant(userZoneId) // Convert to user's local time zone
             zonedDateTime.toLocalDate()
         } catch (e: Exception) {
@@ -36,7 +36,7 @@ fun getGroupedSchedule(sortedSchedule: List<Schedule>): Map<String, List<Schedul
     return sortedSchedule.groupBy {
         try {
             val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
                 .withZoneSameInstant(userZoneId) // Convert to user's local time zone
             formatDateToMonthYear(zonedDateTime.toLocalDate().toString())
         } catch (e: Exception) {
@@ -53,7 +53,7 @@ fun getNextGameIndex(sortedSchedule: List<Schedule>): Int {
     return sortedSchedule.indexOfFirst {
         try {
             val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
+                .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
                 .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
             zonedDateTime.toLocalDate().isAfter(today)
         } catch (e: Exception) {

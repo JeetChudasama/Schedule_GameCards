@@ -18,7 +18,7 @@ fun formatDateToMonthYear(dateString: String, inputFormat: String = "yyyy-MM-dd"
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatDateToCustomFormat(dateString: String, timeZone: String = "UTC"): String {
+fun formatDateToCustomFormat(dateString: String, timeZone: String = "Asia/Kolkata"): String {
     val dateTime = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
     val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone)) // Original time zone
     val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() // Convert to local time
@@ -26,7 +26,7 @@ fun formatDateToCustomFormat(dateString: String, timeZone: String = "UTC"): Stri
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatTime(dateTimeString: String, timeZone: String = "UTC"): String {
+fun formatTime(dateTimeString: String, timeZone: String = "Asia/Kolkata"): String {
     val dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_DATE_TIME)
     val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone)) // Original time zone
     val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() // Convert to local time
