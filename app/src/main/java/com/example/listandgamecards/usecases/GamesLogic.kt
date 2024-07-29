@@ -21,12 +21,11 @@ fun getLatestPastGame(schedule: List<Schedule>): Schedule? {
         .maxByOrNull {
             try {
                 val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
-                    .withZoneSameInstant(userZoneId) // Convert to user's local time zone
-                zonedDateTime.toLocalDate() // Get local date
+                    .atZone(ZoneId.of("Asia/Kolkata"))
+                    .withZoneSameInstant(userZoneId)
+                zonedDateTime.toLocalDate()
             } catch (e: Exception) {
-                // Handle parse exception if necessary, e.g., logging
-                LocalDate.MIN // Use a default date in case of parse error
+                LocalDate.MIN
             }
         }
 }
@@ -41,7 +40,6 @@ fun calculateDuration(gametime: String): Duration {
     return Duration.between(now, gameDateTime)
 }
 
-// Function to format the time components as two-digit strings
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatTimeComponents(duration: Duration): String {
     val days = duration.toDays()
@@ -53,4 +51,30 @@ fun formatTimeComponents(duration: Duration): String {
     val minutesFormatted = String.format("%02d", minutes)
 
     return "$daysFormatted | $hoursFormatted | $minutesFormatted"
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun filterAndSortSchedule(schedule: List<Schedule>): List<Schedule> {
+    return schedule
+        .filter {
+            it.st.toInt() == 1 && try {
+                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZone(ZoneId.of("Asia/Kolkata"))
+                    .withZoneSameInstant(ZoneId.systemDefault())
+                val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
+                zonedDateTime.isAfter(now)
+            } catch (e: Exception) {
+                false
+            }
+        }
+        .sortedBy {
+            try {
+                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+                    .atZone(ZoneId.of("Asia/Kolkata"))
+                    .withZoneSameInstant(ZoneId.systemDefault())
+                zonedDateTime.toLocalDate()
+            } catch (e: Exception) {
+                LocalDate.MIN
+            }
+        }
 }

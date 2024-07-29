@@ -12,52 +12,46 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
-// ScheduleBusinessLogic.kt
 @RequiresApi(Build.VERSION_CODES.O)
 fun getSortedSchedule(schedule: List<Schedule>): List<Schedule> {
-    val userZoneId = ZoneId.systemDefault() // User's local time zone
+    val userZoneId = ZoneId.systemDefault()
     return schedule.sortedBy {
         try {
             val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
-                .withZoneSameInstant(userZoneId) // Convert to user's local time zone
+                .atZone(ZoneId.of("Asia/Kolkata"))
+                .withZoneSameInstant(userZoneId)
             zonedDateTime.toLocalDate()
         } catch (e: Exception) {
-            // Handle parse exception if necessary, e.g., logging
-            LocalDate.MAX // Use a default date in case of parse error
+            LocalDate.MAX
         }
     }
 }
 
-// Function to group the sorted schedule by month and year in the user's local time zone
-@RequiresApi(Build.VERSION_CODES.O)
-fun getGroupedSchedule(sortedSchedule: List<Schedule>): Map<String, List<Schedule>> {
-    val userZoneId = ZoneId.systemDefault() // User's local time zone
-    return sortedSchedule.groupBy {
-        try {
-            val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
-                .withZoneSameInstant(userZoneId) // Convert to user's local time zone
-            formatDateToMonthYear(zonedDateTime.toLocalDate().toString())
-        } catch (e: Exception) {
-            // Handle parse exception if necessary, e.g., logging
-            ""
-        }
-    }
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//fun getGroupedSchedule(sortedSchedule: List<Schedule>): Map<String, List<Schedule>> {
+//    val userZoneId = ZoneId.systemDefault()
+//    return sortedSchedule.groupBy {
+//        try {
+//            val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
+//                .atZone(ZoneId.of("Asia/Kolkata"))
+//                .withZoneSameInstant(userZoneId)
+//            formatDateToMonthYear(zonedDateTime.toLocalDate().toString())
+//        } catch (e: Exception) {
+//            ""
+//        }
+//    }
+//}
 
-// Function to get the index of the next game in the user's local time zone
 @RequiresApi(Build.VERSION_CODES.O)
 fun getNextGameIndex(sortedSchedule: List<Schedule>): Int {
-    val today = LocalDate.now(ZoneId.systemDefault()) // User's local time zone
+    val today = LocalDate.now(ZoneId.systemDefault())
     return sortedSchedule.indexOfFirst {
         try {
             val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
-                .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
+                .atZone(ZoneId.of("Asia/Kolkata"))
+                .withZoneSameInstant(ZoneId.systemDefault())
             zonedDateTime.toLocalDate().isAfter(today)
         } catch (e: Exception) {
-            // Handle parse exception if necessary, e.g., logging
             false
         }
     }

@@ -20,15 +20,15 @@ fun formatDateToMonthYear(dateString: String, inputFormat: String = "yyyy-MM-dd"
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatDateToCustomFormat(dateString: String, timeZone: String = "Asia/Kolkata"): String {
     val dateTime = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
-    val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone)) // Original time zone
-    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() // Convert to local time
+    val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone))
+    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
     return localDateTime.format(DateTimeFormatter.ofPattern("EEE MMM dd", Locale.ENGLISH))
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatTime(dateTimeString: String, timeZone: String = "Asia/Kolkata"): String {
     val dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_DATE_TIME)
-    val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone)) // Original time zone
-    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() // Convert to local time
+    val zonedDateTime = dateTime.atZone(ZoneId.of(timeZone))
+    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
     return localDateTime.format(DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH))
 }

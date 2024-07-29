@@ -53,6 +53,7 @@ import com.example.listandgamecards.Utils.formatDateToCustomFormat
 import com.example.listandgamecards.Utils.formatTime
 import com.example.listandgamecards.models.PromotionCard
 import com.example.listandgamecards.usecases.calculateDuration
+import com.example.listandgamecards.usecases.filterAndSortSchedule
 import com.example.listandgamecards.usecases.filterScheduleByStatus
 import com.example.listandgamecards.usecases.formatTimeComponents
 import com.example.listandgamecards.usecases.getLatestPastGame
@@ -198,11 +199,10 @@ fun PromotionGameCard(promotionCards: List<PromotionCard>, schedule: List<Schedu
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team: List<Team>) {
-    // Filter past games and sort by date
+    val context = LocalContext.current
     val pastGames = filterScheduleByStatus(schedule, 3)
     val latestPastGame = getLatestPastGame(pastGames)
 
-    // Check if there's a past game to display
     latestPastGame?.let { scheduleItem ->
         val homeTeam = team.find { it.tid == scheduleItem.h.tid }
         val visitorTeam = team.find { it.tid == scheduleItem.v.tid }
@@ -234,7 +234,6 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                         .align(Alignment.BottomStart)
                         .padding(8.dp)
                 ) {
-                    // Row to display team logos and game details
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -309,10 +308,16 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
                         }
                     }
 
-                    // Card for "GAME RECAP"
                     Card(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .clickable {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(pastGameCard.button.ctaLink)
+                                )
+                                context.startActivity(intent)
+                                },
                         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
                         colors = CardDefaults.cardColors(Color(0xFFFFAB00)),
                         shape = RoundedCornerShape(50)
@@ -343,31 +348,8 @@ fun PastGameCardImage(pastGameCard: PastGameCard, schedule: List<Schedule>, team
 @Composable
 fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team: List<Team>) {
     val context = LocalContext.current
-    // Filter and sort the schedule for upcoming games (gameStatus = 1)
-    val upcomingGames = schedule
-        .filter {
-            it.st.toInt() == 1 && try {
-                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("Asia/Kolkata")) // Assume input time is in UTC
-                    .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
-                val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
-                zonedDateTime.isAfter(now)
-            } catch (e: Exception) {
-                false // Exclude games if there is a parsing error
-            }
-        }
-        .sortedBy {
-            try {
-                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("Asia/Kolkata"))
-                    .withZoneSameInstant(ZoneId.systemDefault())
-                zonedDateTime.toLocalDate()
-            } catch (e: Exception) {
-                LocalDate.MIN
-            }
-        }
+    val upcomingGames = filterAndSortSchedule(schedule)
 
-    // Get the first upcoming game
     val nextUpcomingGame = upcomingGames.firstOrNull()
 
     nextUpcomingGame?.let { scheduleItem ->
@@ -651,31 +633,7 @@ fun UpcomingGameImage(upcomingGame: UpcomingGame, schedule: List<Schedule>, team
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List<Team>) {
-    // Filter and sort the schedule for future games (gameStatus = 1)
-    val futureGames = schedule
-        .filter {
-            it.st.toInt() == 1 && try {
-                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("UTC")) // Assume input time is in UTC
-                    .withZoneSameInstant(ZoneId.systemDefault()) // Convert to user's local time zone
-                val now = LocalDateTime.now().atZone(ZoneId.systemDefault())
-                zonedDateTime.isAfter(now)
-            } catch (e: Exception) {
-                false // Exclude games if there is a parsing error
-            }
-        }
-        .sortedBy {
-            try {
-                val zonedDateTime = LocalDateTime.parse(it.gametime, DateTimeFormatter.ISO_DATE_TIME)
-                    .atZone(ZoneId.of("UTC"))
-                    .withZoneSameInstant(ZoneId.systemDefault())
-                zonedDateTime.toLocalDate()
-            } catch (e: Exception) {
-                LocalDate.MIN
-            }
-        }
-
-    // Get the second future game
+    val futureGames = filterAndSortSchedule(schedule)
     val secondFutureGame = futureGames.getOrNull(1)
 
     secondFutureGame?.let { scheduleItem ->
@@ -685,7 +643,13 @@ fun FutureGameImage(futureGame: FutureGame, schedule: List<Schedule>, team: List
         val displayVS = if (tid == scheduleItem.h.tid) "VS" else "@"
         val gameStatus = scheduleItem.st
         val displayHA = if (tid == scheduleItem.h.tid) "HOME" else "AWAY"
-        val duration = calculateDuration(scheduleItem.gametime)
+        var duration by remember { mutableStateOf(calculateDuration(scheduleItem.gametime)) }
+        LaunchedEffect(scheduleItem.gametime) {
+            while (true) {
+                delay(60_000L)
+                duration = calculateDuration(scheduleItem.gametime)
+            }
+        }
         val formattedTime = formatTimeComponents(duration)
 
         Card(

@@ -184,7 +184,6 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                 var homeTeamScore by rememberSaveable { mutableStateOf(scheduleItem.h.s) }
                 var visitorTeamScore by rememberSaveable { mutableStateOf(scheduleItem.v.s) }
 
-                // Update game clock every 10 seconds
                 LaunchedEffect(gameStatus) {
                     while (gameStatus.toInt() == 2) {
                         delay(10_000L)
@@ -253,7 +252,7 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
 
                             Text(
                                 text = when (gameStatus.toInt()) {
-                                    1 -> formatTime(scheduleItem.gametime) // Adjust based on actual requirements
+                                    1 -> formatTime(scheduleItem.gametime)
                                     2 -> "$gameQuarter   |   $gameClock"
                                     3 -> "FINAL"
                                     else -> "N/A"
@@ -291,13 +290,21 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(
-                                painter = rememberAsyncImagePainter(visitorTeam?.logo),
-                                contentDescription = "visiter team",
-                                modifier = Modifier
-                                    .size(35.dp)
-                                    .align(Alignment.CenterVertically)
-                            )
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Image(
+                                    painter = rememberAsyncImagePainter(visitorTeam?.logo),
+                                    contentDescription = "visiter team",
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .padding(bottom = 5.dp)
+                                )
+                                if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
+                                    visitorTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.ExtraBold) }
+                                }
+                            }
 //                            Spacer(modifier = Modifier.width(8.dp))
 
                             when (gameStatus.toInt()) {
@@ -336,30 +343,23 @@ fun ScheduleTab(schedule: List<Schedule>, game: Entry, team: List<Team>) {
                             }
 
 //                            Spacer(modifier = Modifier.width(8.dp))
-                            Image(
-                                painter = rememberAsyncImagePainter(homeTeam?.logo),
-                                contentDescription = "home team",
-                                modifier = Modifier
-                                    .size(35.dp)
-                                    .align(Alignment.CenterVertically)
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
-                                visitorTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.ExtraBold) }
-                            }
-                            Spacer(modifier = Modifier.width(180.dp))
-                            if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
-                                homeTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.ExtraBold) }
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Image(
+                                    painter = rememberAsyncImagePainter(homeTeam?.logo),
+                                    contentDescription = "home team",
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .padding(bottom = 5.dp)
+                                )
+                                if(gameStatus.toInt() == 2 || gameStatus.toInt() == 3){
+                                    homeTeam?.ta?.let { Text(text = it, color = Color.White, style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.ExtraBold) }
+                                }
                             }
                         }
+
                         if (gameStatus.toInt() == 1) {
                             Card(
                                 modifier = Modifier
